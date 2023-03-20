@@ -7,6 +7,8 @@ display_menu:-
     write('4 - obliczenie sredniej ceny'), nl,
     write('5 - wyszukanie procesorów po nazwie'), nl,
     write('6 - wyszukanie procesorów po cenie nizszej niz podana'), nl,
+    write('7 - uzupelnienie bazy z pliku o podanej nazwie'), nl,
+    write('8 - zapisanie bazy w pliku'), nl,
     write('Liczba spoza indeksu - koniec programu'), nl, 
     nl,
     read(I),
@@ -36,7 +38,7 @@ menu_option(2) :-
 menu_option(3) :- 
     write('Podaj nazwe procesora do usuniecia:'), 
     read(ProcessorName),
-    retract(computer(ProcessorName,_)),
+    retract(computer(ProcessorName,_,_,_,_)),
     ! ;
     write('Brak takiego procesora ...').
 
@@ -78,6 +80,24 @@ menu_option(6) :-
     nl,nl,
     display_computer_from_list(List,ListLen),
     nl.
+
+menu_option(7) :- 
+    write('Podaj nazwe pliku:'), 
+    read(FileName),
+    exists_file(FileName), 
+    !, 
+    consult(FileName);
+    write('Brak pliku o podanej nazwie'), 
+    nl.
+
+menu_option(8) :- 
+    write('Podaj nazwe pliku:'), 
+    read(FileName),
+    open(FileName, write, X), 
+    save_to_file(X), 
+    close(X).
+menu_option(_) :- 
+    write('Zly numer opcji'), nl.
 
 display_db :- 
     write('Elementy bazy:'), 
@@ -121,7 +141,21 @@ display_computer_from_list([Head|Tail],ListEntryIndexNext):-
     nl,
     ListEntryIndexNext is ListEntryIndex + 1.
 
-
-computer(debil,cc,cd,sad,4).
-computer(debil,cadc,cdawdd,sawdad,3).
-computer(debidl,cc,cd,sad,2).
+save_to_file(X) :- 
+    computer(ProcessorName, ProcessorType,ClockFrequency,HddSize,Price),
+    write(X, 'computer('),
+    write(X, ProcessorName),
+    write(X, ','), 
+    write(X, ProcessorType),
+    write(X, ','), 
+    write(X, ClockFrequency),
+    write(X, ','), 
+    write(X, HddSize),
+    write(X, ','), 
+    write(X, Price), 
+    write(X, ').'), 
+    nl(X), 
+    fail.
+    
+save_to_file(_) :- 
+    nl.
